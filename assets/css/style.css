@@ -1041,3 +1041,79 @@ footer {
     padding-top: 8px;
   }
 }
+
+.caps-acc .cap {
+  border-bottom: 1px dashed var(--line);
+}
+.caps-acc .cap:last-child {
+  border-bottom: 0;
+}
+
+/* 하위 없는 일반 항목 */
+.cap.plain {
+  position: relative;
+  margin: 0;
+  padding: 9px 0 9px 22px;
+  font-size: 15px;
+}
+.cap.plain::before {
+  content: "—";
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-family: "IBM Plex Mono", monospace;
+}
+
+/* 펼칠 수 있는 항목 */
+details.cap > summary {
+  position: relative;
+  display: block;
+  list-style: none;
+  cursor: pointer;
+  padding: 9px 30px 9px 22px;
+  font-size: 15px;
+}
+details.cap > summary::-webkit-details-marker {
+  display: none;
+}
+details.cap > summary::before {
+  content: "—";
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-family: "IBM Plex Mono", monospace;
+}
+details.cap > summary::after {
+  content: "+";
+  position: absolute;
+  right: 6px;
+  top: 9px;
+  font-family: "IBM Plex Mono", monospace;
+  color: var(--accent);
+}
+details.cap[open] > summary::after {
+  content: "–";
+}
+details.cap > summary:hover {
+  color: var(--accent);
+}
+
+/* 하위 리스트 */
+details.cap > ul {
+  margin: 0 0 10px;
+  padding: 0 0 0 22px;
+  list-style: none;
+}
+details.cap > ul > li {
+  position: relative;
+  padding: 6px 0 6px 16px;
+  font-size: 14px;
+  color: var(--muted);
+}
+details.cap > ul > li::before {
+  content: "└";
+  position: absolute;
+  left: 0;
+  color: var(--faint);
+  font-family: "IBM Plex Mono", monospace;
+}
