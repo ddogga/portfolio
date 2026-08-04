@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>판매 통계 대시보드 · 하연</title>
+    <title>조회 성능 최적화 실험 · 하연</title>
     <script>
       try {
         var t = localStorage.getItem("theme");
@@ -88,7 +88,7 @@
             <span class="sep">/</span>
             <span class="cur">sales-query-performance</span>
           </nav>
-          <span class="badge pro static reveal">Personal</span>
+          <span class="badge per static reveal">Personal</span>
           <h1 class="reveal" style="margin: 10px 0px;">조회 성능 최적화 실험</h1>
           <p class="summary reveal">
             하나의 조회 API — 카테고리별 Top10 매출 통계 — 를 가지고, 
@@ -112,6 +112,7 @@
             <div class="srow">
               <span class="sk">Tech Stack</span>
               <span class="sv">
+                <span class="tk">Java</span>
                 <span class="tk">Spring Boot</span><span class="tk">JPA</span
                 ><span class="tk">QueryDSL</span>
                 <span class="tk">PostgreSQL</span><span class="tk">MongoDB</span
@@ -139,7 +140,7 @@
             </div>
             <div class="caps-acc reveal">
               <p class="cap plain">캐싱·저장 전략을 ① DB 비정규화 → ② Caffeine → ③ MongoDB → ④ Redis 로 단계적으로 바꿔가며 각 단계의 장단점 비교</p>
-              <details class="cap">
+              <details class="cap" open>
                 <summary>Caffeine 캐시를 활용한 조회 성능 최적화</summary>
                 <ul>
                   <li>L1(집계 결과) / L2(과거 집계) 2계층 캐시 구조를 설계하여 캐시 미스 시 재집계 비용 최소화</li>
@@ -147,7 +148,7 @@
                   <li>Spring Cache 추상화(@Cacheable)를 적용하여 캐시 구현체를 분리하고, Redis 등 다른 캐시로 쉽게 교체할 수 있는 구조 설계</li>
                 </ul>
               </details>
-              <details class="cap">
+              <details class="cap" open>
                 <summary>캐시 스탬피드 방지를 위한 분산 락 적용</summary>
                 <ul>
                   <li>Redis lockingRedisCacheWriter를 적용하여 다중 서버 환경에서도 동일 키의 재계산이 한 번만 수행되도록 분산 락 구현</li>
@@ -156,7 +157,7 @@
                   <li>CountDownLatch 기반 동시성 테스트를 작성하여 캐시 스탬피드를 재현하고, 동시 30개 요청 시 재계산 횟수를 30회 → 1회로 검증</li>
                 </ul>
               </details>
-              <details class="cap">
+              <details class="cap" open>
                 <summary>스케줄러 기반 판매량 집계 배치 서비스 구현</summary>
                 <ul>
                   <li>PostgreSQL 네이티브 집계 쿼리를 활용하여 대량 데이터를 DB 내부에서 집계·적재하도록 구현해 애플리케이션 처리 부담을 최소화</li>
