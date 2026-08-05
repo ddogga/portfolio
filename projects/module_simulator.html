@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="ko" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>전력 관리 모듈 시뮬레이터 신규 개발· 하연</title>
+    <script>
+      try {
+        var t = localStorage.getItem("theme");
+        document.documentElement.setAttribute(
+          "data-theme",
+          t === "light" ? "light" : "dark",
+        );
+      } catch (e) {
+        document.documentElement.setAttribute("data-theme", "dark");
+      }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+  </head>
+  <body>
+    <header id="header">
+      <div class="wrap bar">
+        <a href="../index.html#top" class="mark"
+          >하연<span class="a">.</span>dev</a
+        >
+        <nav class="top" aria-label="주요 섹션">
+          <a href="../index.html#profile">About</a>
+          <a href="../index.html#experience">Experience</a>
+          <a href="../index.html#projects">Projects</a>
+          <a
+            href="https://github.com/"
+            target="_blank"
+            rel="noopener"
+            class="gh"
+            >GitHub ↗</a
+          >
+          <button
+            id="themeToggle"
+            class="theme-btn"
+            type="button"
+            aria-label="다크/라이트 테마 전환"
+            title="테마 전환"
+          >
+            <svg
+              class="i-moon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.7"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.6 6.6 0 0 0 9.8 9.8z" />
+            </svg>
+            <svg
+              class="i-sun"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.7"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="4" />
+              <path
+                d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"
+              />
+            </svg>
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <div class="detail-layout">
+        <!-- LEFT: sticky project info -->
+        <aside class="detail-side">
+          <nav class="crumb reveal" aria-label="위치">
+            <a href="../index.html#projects">~/projects</a>
+            <span class="sep">/</span>
+            <span class="cur">sales-query-performance</span>
+          </nav>
+          <span class="badge pro static reveal">Professional</span>
+          <h1 class="reveal" style="margin: 10px 0px">
+            전력 관리 모듈 시뮬레이터 신규 개발
+          </h1>
+          <p class="summary reveal">
+            6종 전력 모듈을 멀티스레드로 동시 구동하는 모듈 시뮬레이터와, 이를
+            UDP 프로토콜로 감시·제어하는 시뮬레이터 개발
+          </p>
+
+          <div class="spec crop reveal">
+            <div class="srow">
+              <span class="sk">Period</span>
+              <span class="sv"
+                ><span class="txt">2023.08 – 2024.07 </span></span
+              >
+            </div>
+            <div class="srow">
+              <span class="sk">Role · Team</span>
+              <span class="sv"
+                ><span class="txt">Backend · 진행 인원 : 2명 </span></span
+              >
+            </div>
+            <div class="srow">
+              <span class="sk">Tech Stack</span>
+              <span class="sv">
+                <span class="tk">Java</span><span class="tk">Spring Boot</span>
+                <span class="tk">Java DatagramSocket(UDP)</span
+                ><span class="tk">WebSocket</span>
+                <span>thymeleaf</span>
+              </span>
+            </div>
+          </div>
+        </aside>
+
+        <!-- RIGHT: scrolling content -->
+        <div class="detail-main">
+          <!-- §01 CONTRIBUTIONS -->
+          <section id="contributions">
+            <div class="sec-head reveal">
+              <span class="sec-no">§01</span
+              ><span class="sec-title">Contributions</span>
+              <span class="sec-rule"></span>
+            </div>
+            <div class="caps-acc reveal">
+              <details class="cap" open>
+                <summary>UDP 기반 전력 모듈 통신 프로토콜 구현</summary>
+                <ul>
+                  <li>
+                    실제 장비와 동일한 UDP 바이너리 프로토콜을 구현하여 전력
+                    모듈과 통신
+                  </li>
+                  <li>
+                    Polling 방식으로 전류·전압 등 측정값을 주기적으로 수집하고,
+                    원격 스위치 제어 기능 구현
+                  </li>
+                  <li>
+                    실제 장비와 동일한 통신 환경을 시뮬레이션하여 기능 검증 지원
+                  </li>
+                </ul>
+              </details>
+              <details class="cap" open>
+                <summary>전력 모듈 시뮬레이터 개발</summary>
+                <ul>
+                  <li>
+                    규격에 맞는 명령 코드를 수신하면 스위치 제어 및 측정값을
+                    응답하는 가상 장비 구현
+                  </li>
+                  <li>
+                    실제 장비 없이도 개발 및 테스트가 가능한 시뮬레이션 환경
+                    구축
+                  </li>
+                  <li>장비 프로토콜 검증 및 기능 테스트 효율 향상</li>
+                </ul>
+              </details>
+              <details class="cap" open>
+                <summary>관제 시뮬레이터(UI) 개발</summary>
+                <ul>
+                  <li>
+                    Thymeleaf 기반 UI를 구현하여 가상 장비를 제어하는 관제 화면
+                    개발
+                  </li>
+                  <li>
+                    사용자 입력을 규격 프로토콜로 변환하여 장비에 전송하고 응답
+                    결과를 실시간 표시
+                  </li>
+                  <li>
+                    사용자 입력을 규격 프로토콜로 변환하여 장비에 전송하고 응답
+                    결과를 실시간 표시
+                  </li>
+                </ul>
+              </details>
+              <details class="cap" open>
+                <summary>멀티스레드 기반 장비 동시 구동</summary>
+                <ul>
+                  <li>
+                    하나의 프로그램에서 6종의 전력 모듈을 동시에
+                    시뮬레이션하도록 멀티스레드 구조 설계
+                  </li>
+                  <li>
+                    장비별 독립적인 스레드를 운영하며 생명주기와 동시성 이슈
+                    관리
+                  </li>
+                  <li>
+                    다수 장비를 동시에 구동하는 환경에서도 안정적인 시뮬레이션
+                    지원
+                  </li>
+                </ul>
+              </details>
+              <details class="cap" open>
+                <summary>요청-응답 순서 보장을 위한 비동기 제어</summary>
+                <ul>
+                  <li>
+                    Timer 기반 비동기 통신 구조에서 요청과 응답의 순서를
+                    관리하는 로직 구현
+                  </li>
+                  <li>
+                    응답이 도착하기 전에는 다음 명령을 제한하여 요청-응답 동기성
+                    보장
+                  </li>
+                  <li>타임아웃 처리 및 통신 안정성 향상</li>
+                </ul>
+              </details>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <footer class="wrap">
+      <span>© 2026 하연 — Backend Developer</span>
+      <span>blueprint · built for github.io</span>
+    </footer>
+
+    <script src="../assets/js/main.js"></script>
+  </body>
+</html>
