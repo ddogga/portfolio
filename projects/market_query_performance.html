@@ -89,11 +89,12 @@
             <span class="cur">sales-query-performance</span>
           </nav>
           <span class="badge per static reveal">Personal</span>
-          <h1 class="reveal" style="margin: 10px 0px;">조회 성능 최적화 실험</h1>
+          <h1 class="reveal" style="margin: 10px 0px">조회 성능 최적화 실험</h1>
           <p class="summary reveal">
-            하나의 조회 API — 카테고리별 Top10 매출 통계 — 를 가지고, 
-            캐싱·저장 전략을 ① DB 비정규화 → ② Caffeine → ③ MongoDB → ④ Redis 로 
-            단계적으로 바꿔가며 각 단계의 검색 속도를 직접 측정·비교하는 실험 프로젝트. 
+            하나의 조회 API — 카테고리별 Top10 매출 통계 — 를 가지고, 캐싱·저장
+            전략을 ① DB 비정규화 → ② Caffeine → ③ MongoDB → ④ Redis 로
+            단계적으로 바꿔가며 각 단계의 검색 속도를 직접 측정·비교하는 실험
+            프로젝트.
           </p>
 
           <div class="spec crop reveal">
@@ -117,13 +118,19 @@
                 ><span class="tk">QueryDSL</span>
                 <span class="tk">PostgreSQL</span><span class="tk">MongoDB</span
                 ><span class="tk">Redis</span> <span class="tk">Docker</span
-                ><span class="tk">Caffeine</span><span class="tk">Testcontainers</span>
+                ><span class="tk">Caffeine</span
+                ><span class="tk">Testcontainers</span>
               </span>
             </div>
             <div class="srow">
               <span class="sk">Links</span>
               <span class="sv">
-                <a href="https://github.com/ddogga/market" target="_blank" rel="noopener">GitHub ↗</a>
+                <a
+                  href="https://github.com/ddogga/market"
+                  target="_blank"
+                  rel="noopener"
+                  >GitHub ↗</a
+                >
               </span>
             </div>
           </div>
@@ -139,30 +146,67 @@
               <span class="sec-rule"></span>
             </div>
             <div class="caps-acc reveal">
-              <p class="cap plain">캐싱·저장 전략을 ① DB 비정규화 → ② Caffeine → ③ MongoDB → ④ Redis 로 단계적으로 바꿔가며 각 단계의 장단점 비교</p>
+              <p class="cap plain">
+                캐싱·저장 전략을 ① DB 비정규화 → ② Caffeine → ③ MongoDB → ④
+                Redis 로 단계적으로 바꿔가며 각 단계의 장단점 비교
+              </p>
               <details class="cap" open>
                 <summary>Caffeine 캐시를 활용한 조회 성능 최적화</summary>
                 <ul>
-                  <li>L1(집계 결과) / L2(과거 집계) 2계층 캐시 구조를 설계하여 캐시 미스 시 재집계 비용 최소화</li>
-                  <li>오늘 포함 구간과 과거 구간의 데이터 변경 특성에 맞춰 TTL을 차등 적용하여 성능과 신선도를 동시에 고려</li>
-                  <li>Spring Cache 추상화(@Cacheable)를 적용하여 캐시 구현체를 분리하고, Redis 등 다른 캐시로 쉽게 교체할 수 있는 구조 설계</li>
+                  <li>
+                    L1(집계 결과) / L2(과거 집계) 2계층 캐시 구조를 설계하여
+                    캐시 미스 시 재집계 비용 최소화
+                  </li>
+                  <li>
+                    오늘 포함 구간과 과거 구간의 데이터 변경 특성에 맞춰 TTL을
+                    차등 적용하여 성능과 신선도를 동시에 고려
+                  </li>
+                  <li>
+                    Spring Cache 추상화(@Cacheable)를 적용하여 캐시 구현체를
+                    분리하고, Redis 등 다른 캐시로 쉽게 교체할 수 있는 구조 설계
+                  </li>
                 </ul>
               </details>
               <details class="cap" open>
                 <summary>캐시 스탬피드 방지를 위한 분산 락 적용</summary>
                 <ul>
-                  <li>Redis lockingRedisCacheWriter를 적용하여 다중 서버 환경에서도 동일 키의 재계산이 한 번만 수행되도록 분산 락 구현</li>
-                  <li>@Cacheable(sync = true)를 활용해 단일 서버 환경에서 동일 키의 동시 요청을 하나의 재계산으로 통합</li>
-                  <li>자정 캐시 키 롤오버로 발생하는 대량 캐시 미스를 완화하기 위해 캐시 프리워밍(Pre-warming) 구조 구현</li>
-                  <li>CountDownLatch 기반 동시성 테스트를 작성하여 캐시 스탬피드를 재현하고, 동시 30개 요청 시 재계산 횟수를 30회 → 1회로 검증</li>
+                  <li>
+                    Redis lockingRedisCacheWriter를 적용하여 다중 서버
+                    환경에서도 동일 키의 재계산이 한 번만 수행되도록 분산 락
+                    구현
+                  </li>
+                  <li>
+                    @Cacheable(sync = true)를 활용해 단일 서버 환경에서 동일
+                    키의 동시 요청을 하나의 재계산으로 통합
+                  </li>
+                  <li>
+                    자정 캐시 키 롤오버로 발생하는 대량 캐시 미스를 완화하기
+                    위해 캐시 프리워밍(Pre-warming) 구조 구현
+                  </li>
+                  <li>
+                    CountDownLatch 기반 동시성 테스트를 작성하여 캐시 스탬피드를
+                    재현하고, 동시 30개 요청 시 재계산 횟수를 30회 → 1회로 검증
+                  </li>
                 </ul>
               </details>
               <details class="cap" open>
                 <summary>스케줄러 기반 판매량 집계 배치 서비스 구현</summary>
                 <ul>
-                  <li>PostgreSQL 네이티브 집계 쿼리를 활용하여 대량 데이터를 DB 내부에서 집계·적재하도록 구현해 애플리케이션 처리 부담을 최소화</li>
-                  <li>ON CONFLICT DO NOTHING과 복합 PK를 활용하여 재실행에도 동일한 결과를 보장하는 멱등 배치 구현</li>
-                  <li>일일 스케줄러와 애플리케이션 기동 시 동작하는 백필(Backfill) 구조를 분리하여 운영 환경에서 발생할 수 있는 재실행·배치 실패 상황을 고려하여 안정적인 배치 처리 구조 설계</li>
+                  <li>
+                    PostgreSQL 네이티브 집계 쿼리를 활용하여 대량 데이터를 DB
+                    내부에서 집계·적재하도록 구현해 애플리케이션 처리 부담을
+                    최소화
+                  </li>
+                  <li>
+                    ON CONFLICT DO NOTHING과 복합 PK를 활용하여 재실행에도
+                    동일한 결과를 보장하는 멱등 배치 구현
+                  </li>
+                  <li>
+                    일일 스케줄러와 애플리케이션 기동 시 동작하는
+                    백필(Backfill) 구조를 분리하여 운영 환경에서 발생할 수 있는
+                    재실행·배치 실패 상황을 고려하여 안정적인 배치 처리 구조
+                    설계
+                  </li>
                 </ul>
               </details>
               <p class="cap plain">Docker Compose 기반 개발 환경 구축</p>
@@ -174,7 +218,7 @@
             <div class="sec-head reveal">
               <span class="sec-no">§02</span
               ><span class="sec-title">Problem Solving</span>
-              <span class="sec-rule">
+              <span class="sec-rule"></span>
             </div>
 
             <article class="ps-case reveal">
@@ -202,11 +246,22 @@
                 </div>
                 <div class="ps-row">
                   <span class="ps-label">해결 방법</span
-                  ><span class="ps-text"
-                    >분산 락으로 캐시 재생성을 단일 요청에만 허용하고, TTL에
-                    지터(jitter)를 부여해 만료 시점을 분산시켰다. 갱신 중에는
-                    만료된 값을 임시로 반환하는 논블로킹 방식을 적용했다.</span
-                  >
+                  ><span class="ps-text">
+                    <ui>
+                      <li>
+                        캐시 만료 시 발생하는 스탬피드를 단일 서버와 다중 서버
+                        환경으로 나누어 2단계로 방어.
+                      </li>
+                      <li>
+                        인스턴스 내부에서는 @Cacheale(sync = true)를 적용해 동일
+                        키에 대한 동시 캐시 미스를 하나의 재계산으로 통합.
+                      </li>
+                      <li>
+                        다중 서버 환경에서는 Redis 기반 분산 락을 적용해
+                        클러스터 전체에서 재계산이 한 번만 수행되도록 구현.
+                      </li>
+                    </ui>
+                  </span>
                 </div>
                 <div class="ps-row lesson">
                   <span class="ps-label">핵심 교훈</span
@@ -222,32 +277,42 @@
               <div class="ps-head">
                 <span class="ps-no">PS-02</span
                 ><span class="ps-title"
-                  >서버 스케일업 환경에서 스케줄러가 인스턴스 마다 동작하는 문제</span
+                  >서버 스케일업 환경에서 스케줄러가 인스턴스 마다 동작하는
+                  문제</span
                 >
               </div>
               <div class="ps-body">
                 <div class="ps-row">
                   <span class="ps-label">문제 상황</span
                   ><span class="ps-text"
-                    >docker compose up --scale app=3 처럼 앱 인스턴스가 수평 확장된 서버 스케일업 환경에서는 자정시 돌아가는 매출 집계 스케줄러가 서버 인스턴스 마다 돌아가서 중복 실행 된다.</span
+                    >docker compose up --scale app=3 처럼 앱 인스턴스가 수평
+                    확장된 서버 스케일업 환경에서는 자정시 돌아가는 매출 집계
+                    스케줄러가 서버 인스턴스 마다 돌아가서 중복 실행 된다.</span
                   >
                 </div>
                 <div class="ps-row">
                   <span class="ps-label">원인</span
-                  ><span class="ps-text"
-                    > @Scheduled는 단일 JVM 내에서만 동작을 조율할 수 있다. 여러 인스턴스가 같은 PostgreSQL을 공유하더라도, 각 인스턴스는 서로의 존재를 모르기 때문에 동일한 작업을 동시에 시작한다.</span
+                  ><span class="ps-text">
+                    @Scheduled는 단일 JVM 내에서만 동작을 조율할 수 있다. 여러
+                    인스턴스가 같은 PostgreSQL을 공유하더라도, 각 인스턴스는
+                    서로의 존재를 모르기 때문에 동일한 작업을 동시에
+                    시작한다.</span
                   >
                 </div>
                 <div class="ps-row">
                   <span class="ps-label">해결 방법</span
                   ><span class="ps-text"
-                    >공유 DB(PostgreSQL)를 락 저장소로 사용하는 ShedLock을 도입해, @SchedulerLock으로 N개 인스턴스 중 락을 획득한 단 하나의 인스턴스만 스케줄러를 실행하도록 보장했다.</span
+                    >공유 DB(PostgreSQL)를 락 저장소로 사용하는 ShedLock을
+                    도입해, @SchedulerLock으로 N개 인스턴스 중 락을 획득한 단
+                    하나의 인스턴스만 스케줄러를 실행하도록 보장했다.</span
                   >
                 </div>
                 <div class="ps-row lesson">
                   <span class="ps-label">핵심 교훈</span
                   ><span class="ps-text"
-                    >분산 환경에서 @Scheduled는 JVM마다 독립 실행되므로, 공유 외부 저장소 기반의 분산 락으로 "단일 실행"을 별도로 보장해야 한다.</span
+                    >분산 환경에서 @Scheduled는 JVM마다 독립 실행되므로, 공유
+                    외부 저장소 기반의 분산 락으로 "단일 실행"을 별도로 보장해야
+                    한다.</span
                   >
                 </div>
               </div>
@@ -256,33 +321,40 @@
             <article class="ps-case reveal">
               <div class="ps-head">
                 <span class="ps-no">PS-03</span
-                ><span class="ps-title">캐시를 적용해도 성능 향상이 일어나지 않은 문제</span>
+                ><span class="ps-title"
+                  >캐시를 적용해도 성능 향상이 일어나지 않은 문제</span
+                >
               </div>
               <div class="ps-body">
                 <div class="ps-row">
                   <span class="ps-label">문제 상황</span
                   ><span class="ps-text"
-                    >캐시를 적용했음에도, 실시간 조회 방식과 성능 차이가 거의 발생하지 않았다.</span
+                    >캐시를 적용했음에도, 실시간 조회 방식과 성능 차이가 거의
+                    발생하지 않았다.</span
                   >
                 </div>
                 <div class="ps-row">
                   <span class="ps-label">원인</span
                   ><span class="ps-text"
-                    >오늘 매출 데이터는 캐시 TTL이 짧아 수시로 데이터 신선도를 위해 실시간 집계를 진행하는데, 
-                    created_at 컬럼에 인덱스가 없어 데이터를 풀스캔 하여 조회가 느려고 있었다.</span
+                    >오늘 매출 데이터는 캐시 TTL이 짧아 수시로 데이터 신선도를
+                    위해 실시간 집계를 진행하는데, created_at 컬럼에 인덱스가
+                    없어 데이터를 풀스캔 하여 조회가 느려고 있었다.</span
                   >
                 </div>
                 <div class="ps-row">
                   <span class="ps-label">해결 방법</span
                   ><span class="ps-text"
-                    >order_items.created_at 컬럼에 인덱스를 추가하여 날짜 조건 조회가 Index Scan으로 수행되도록 개선</span
+                    >order_items.created_at 컬럼에 인덱스를 추가하여 날짜 조건
+                    조회가 Index Scan으로 수행되도록 개선</span
                   >
                 </div>
                 <div class="ps-row lesson">
                   <span class="ps-label">핵심 교훈</span
                   ><span class="ps-text"
-                    >캐시만으로 성능이 향상되는 것은 아니며, 캐시 미스 시 수행되는 조회(Query)의 성능도 함께 최적화되어야 한다. 
-                    성능 개선에서는 캐시뿐 아니라 실행 계획과 인덱스 설계까지 함께 고려해야 한다는 점을 경험했다.</span
+                    >캐시만으로 성능이 향상되는 것은 아니며, 캐시 미스 시
+                    수행되는 조회(Query)의 성능도 함께 최적화되어야 한다.  성능
+                    개선에서는 캐시뿐 아니라 실행 계획과 인덱스 설계까지 함께
+                    고려해야 한다는 점을 경험했다.</span
                   >
                 </div>
               </div>
@@ -297,35 +369,40 @@
                 <div class="ps-row">
                   <span class="ps-label">문제 상황</span
                   ><span class="ps-text"
-                    >운영 환경(PostgreSQL)과 테스트 환경(H2)의 DB가 달라 SQL 지원 범위가 달라 
-                    테스트를 통과해도 운영 환경에서 오류가 발생할 가능성이 존재했다.</span
+                    >운영 환경(PostgreSQL)과 테스트 환경(H2)의 DB가 달라 SQL
+                    지원 범위가 달라 테스트를 통과해도 운영 환경에서 오류가
+                    발생할 가능성이 존재했다.</span
                   >
                 </div>
                 <div class="ps-row">
                   <span class="ps-label">원인</span
                   ><span class="ps-text"
-                    >H2는 인메모리 기반 빠른 테스트 환경 세팅 및 실행이 편리해 사용중이었고 
-                    별도의 테스트용 PostgreSQL을 사용하기에는 로컬 환경마다 테스트 결과가 달라질 수 있었다.</span
+                    >H2는 인메모리 기반 빠른 테스트 환경 세팅 및 실행이 편리해
+                    사용중이었고 별도의 테스트용 PostgreSQL을 사용하기에는 로컬
+                    환경마다 테스트 결과가 달라질 수 있었다.</span
                   >
                 </div>
                 <div class="ps-row">
                   <span class="ps-label">해결 방법</span
                   ><span class="ps-text"
-                    >테스트 환경을 **H2에서 Testcontainers(PostgreSQL)***기반으로 전환하여 Docker Daemon이 구동중인 환경의 제약성을 가져가는 대신
-                    테스트 환경 차이를 제거하는 방법을 택했다.</span
+                    >테스트 환경을 **H2에서
+                    Testcontainers(PostgreSQL)***기반으로 전환하여 Docker
+                    Daemon이 구동중인 환경의 제약성을 가져가는 대신 테스트 환경
+                    차이를 제거하는 방법을 택했다.</span
                   >
                 </div>
                 <div class="ps-row lesson">
                   <span class="ps-label">핵심 교훈</span
                   ><span class="ps-text"
-                    >테스트의 실행 속도보다 **운영 환경과 동일한 환경에서 검증하는 신뢰성**이 더 중요하다는 점을 경험했다.
-                    Testcontainers를 활용하면 로컬과 CI에서 동일한 테스트 환경을 구축할 수 있어 
-                    운영 환경에서 발생할 수 있는 SQL 호환성 문제를 사전에 검증할 수 있었다.</span
+                    >테스트의 실행 속도보다 **운영 환경과 동일한 환경에서
+                    검증하는 신뢰성**이 더 중요하다는 점을 경험했다.
+                    Testcontainers를 활용하면 로컬과 CI에서 동일한 테스트 환경을
+                    구축할 수 있어 운영 환경에서 발생할 수 있는 SQL 호환성
+                    문제를 사전에 검증할 수 있었다.</span
                   >
                 </div>
               </div>
             </article>
-
           </section>
 
           <!-- §03 STUDY -->
@@ -333,12 +410,16 @@
             <div class="sec-head reveal">
               <span class="sec-no">§03</span
               ><span class="sec-title">Study</span>
-              <span class="sec-rule"></span
-              >
+              <span class="sec-rule"></span>
             </div>
 
             <div class="exp-list crop reveal">
-              <a class="study-row" href="https://app.notion.com/p/MongoDB-RDB-39b929e5e2a5801f84abc370d1fcf6fc?source=copy_link" target="_blank" rel="noopener">
+              <a
+                class="study-row"
+                href="https://app.notion.com/p/MongoDB-RDB-39b929e5e2a5801f84abc370d1fcf6fc?source=copy_link"
+                target="_blank"
+                rel="noopener"
+              >
                 <span class="study-idx">01</span>
                 <div class="study-main">
                   <span class="study-title"
@@ -350,19 +431,27 @@
                 </div>
                 <span class="study-ext">NOTION ↗</span>
               </a>
-              <a class="study-row" href="https://app.notion.com/p/WAS-39e929e5e2a5808dbc06ff7a3f03574f?source=copy_link" target="_blank" rel="noopener">
+              <a
+                class="study-row"
+                href="https://app.notion.com/p/WAS-39e929e5e2a5808dbc06ff7a3f03574f?source=copy_link"
+                target="_blank"
+                rel="noopener"
+              >
                 <span class="study-idx">02</span>
                 <div class="study-main">
-                  <span class="study-title"
-                    >웹서버와 WAS를 같이 쓰는 이유</span
-                  >
+                  <span class="study-title">웹서버와 WAS를 같이 쓰는 이유</span>
                   <span class="study-desc"
                     >이 프로젝트에서 Nginx를 사용하는 이유 정리</span
                   >
                 </div>
                 <span class="study-ext">NOTION ↗</span>
               </a>
-              <a class="study-row" href="https://app.notion.com/p/Redis-39f929e5e2a580849c29d2a44ea7df8f?source=copy_link" target="_blank" rel="noopener">
+              <a
+                class="study-row"
+                href="https://app.notion.com/p/Redis-39f929e5e2a580849c29d2a44ea7df8f?source=copy_link"
+                target="_blank"
+                rel="noopener"
+              >
                 <span class="study-idx">03</span>
                 <div class="study-main">
                   <span class="study-title"
@@ -374,14 +463,20 @@
                 </div>
                 <span class="study-ext">NOTION ↗</span>
               </a>
-              <a class="study-row" href="https://app.notion.com/p/Spring-boot-Docker-39e929e5e2a580049df0cce9912b7ed0?source=copy_link" target="_blank" rel="noopener">
+              <a
+                class="study-row"
+                href="https://app.notion.com/p/Spring-boot-Docker-39e929e5e2a580049df0cce9912b7ed0?source=copy_link"
+                target="_blank"
+                rel="noopener"
+              >
                 <span class="study-idx">04</span>
                 <div class="study-main">
                   <span class="study-title"
                     >Spring boot 로컬에서 Docker 환경으로 마이그레이션</span
                   >
                   <span class="study-desc"
-                    >로컬에서 Docker 환경으로 마이그레이션 및 Docker 실행 흐름 정리</span
+                    >로컬에서 Docker 환경으로 마이그레이션 및 Docker 실행 흐름
+                    정리</span
                   >
                 </div>
                 <span class="study-ext">NOTION ↗</span>
