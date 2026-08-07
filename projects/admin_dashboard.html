@@ -181,10 +181,18 @@
                 </ul>
               </details>
               <details class="cap" open>
-                <summary>쇼핑몰 관리자 페이지 개발</summary>
+                <summary>
+                  공용 페이지네이션 컴포넌트 및 Vuex 전역 페이지 상태 설계
+                </summary>
                 <ul>
                   <li>
-                    공용 페이지네이션 컴포넌트 및 Vuex 전역 페이지 상태 설계
+                    동일한 페이징 UI가 필요한 여러 조회 목록 화면을 위해 공용
+                    페이지네이션 컴포넌트를 구축.
+                  </li>
+                  <li>
+                    페이지 정보를 Vuex에 두고, 페이지 클릭 시 reqPage 값만
+                    변경하면 각 화면이 이를 watch로 감지해 화면에 맞는 조회
+                    API를 호출하도록 설계.
                   </li>
                 </ul>
               </details>
