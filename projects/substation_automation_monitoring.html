@@ -345,17 +345,16 @@
 
             <article class="ps-case reveal">
               <div class="ps-head">
-                <span class="ps-no">PS-03</span
-                ><span class="ps-title"
-                  >JNI를 타는 로직에서 스레드가 무한 대기</span
-                >
+                <span class="ps-no">PS-03</span>
+                <span class="ps-title">스레드 무한 대기 문제 예방</span>
               </div>
               <div class="ps-body">
                 <div class="ps-row">
                   <span class="ps-label">문제 상황</span
                   ><span class="ps-text"
-                    >여러 요청을 동시에 처리하는 서버에서 워커 스레드 두 개가
-                    무한대기하여 CPU를 100%를 점유하며 멈췄음.
+                    >VisualVM으로 모니터링 중 여러 요청을 동시에 처리하는
+                    서버에서 워커 스레드 두 개가 무한대기하여 CPU를 100%를
+                    점유하며 멈춰 있는 상황 발생
                   </span>
                 </div>
                 <div class="ps-row">
@@ -389,6 +388,79 @@
                   ><span class="ps-text"
                     >외부 응답에 의존하는 호출은 반드시 타임아웃을 둬서 스레드가
                     묶이는 것을 방지 해야함.
+                  </span>
+                </div>
+              </div>
+            </article>
+
+            <article class="ps-case reveal">
+              <div class="ps-head">
+                <span class="ps-no">PS-04</span>
+                <span class="ps-title"
+                  >Mybatis -> JPA 마이그레이션 작업 효율 향상</span
+                >
+              </div>
+              <div class="ps-body">
+                <div class="ps-row">
+                  <span class="ps-label"> 상황</span
+                  ><span class="ps-text"
+                    >MyBatis 사용 시 코드 가독성이 떨어지거나 사소한 스키마
+                    변경에도 관련 XML Mapper 파일을 전부 찾아서 수정해야 하는 등
+                    유지 보수에 어려움이 있고 또한 MSSQL을 추후 다른 DB를 변경할
+                    가능성도 있어 JPA로의 마이그레이션을 결정함.
+                  </span>
+                </div>
+                <div class="ps-row">
+                  <span class="ps-label">문제</span
+                  ><span class="ps-text">
+                    약 60개가 넘는 테이블들을 엔티티 파일로 변경해야 하고 이를
+                    수작업으로 진행 시 필드 타입 오타등 휴먼 에러가 발생할
+                    확률이 높음. 따라서 테이블의 메타데이터를 조회해 엔티티 및
+                    repository, mapstruct 파일 생성을 자동화 하여야겠다고 판단.
+                  </span>
+                </div>
+                <div class="ps-row">
+                  <span class="ps-label">해결 방법</span
+                  ><span class="ps-text">
+                    마이그레이션 과정
+                    <p>
+                      1. DB 스키마 메타데이터를 분석해 Entity 파일 자동 생성 —
+                      컬럼 타입·nullable·unique·PK·기본값 등을 규칙 기반으로
+                      매핑하여 반복적인 엔티티 작성을 자동화
+                    </p>
+                    <p>
+                      2. 엔티티별 Repository 및 MapStruct 기반 DTO ↔ Entity 매핑
+                      파일 자동 생성
+                    </p>
+                    <p>
+                      3. 연관관계는 선별적으로 적용 — JPA를 처음 도입하는
+                      환경임을 고려해, 생명주기를 공유하고 있는 엔티티간에만
+                      선별적으로 연관관계를 매핑하고 나머지는 ID 참조로 유지.
+                      자동 조인·캐스케이드의 편의를 포기하는 대신, N+1 등
+                      예측하기 어려운 문제를 예방하고 조회 성능을 확보
+                    </p>
+                    <p>
+                      4. 서비스 계층의 MyBatis 의존을 JPA 의존으로 전환 — 기존
+                      매퍼 호출을 Repository 기반으로 이관
+                    </p>
+                    <p>
+                      5. 복잡한 동적 쿼리는 QueryDSL로 구현 — 문자열 기반 쿼리
+                      대비 타입 안전성과 가독성 확보
+                    </p>
+                    <p>
+                      6. 쿼리 성격에 따라 JPQL과 Native Query로 구현 범위를
+                      분리 — 간단한 쿼리는 JPQL로, Bulk 연산은 Native Query로
+                      구현하여 DB 독립성을 포기하는 대신 성능을 확보
+                    </p>
+                  </span>
+                </div>
+                <div class="ps-row lesson">
+                  <span class="ps-label">결과</span
+                  ><span class="ps-text"
+                    >약 180개 이상의 파일을 일일이 수작업으로 생성하는 대신
+                    코드를 통해 자동화 하여 작업 효율을 크게 향상 시켰고,
+                    연관관계 선별 적용으로 JPA로 전환시 생길 수 있는 성능
+                    저하와, N+1 문제를 예방함.
                   </span>
                 </div>
               </div>
