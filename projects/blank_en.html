@@ -86,13 +86,14 @@
           <nav class="crumb reveal" aria-label="위치">
             <a href="../index.html#projects">~/projects</a>
             <span class="sep">/</span>
-            <span class="cur">sales-query-performance</span>
+            <span class="cur">blank_en</span>
           </nav>
           <span class="badge per static reveal">Personal</span>
           <h1 class="reveal" style="margin: 10px 0px">BlankEn</h1>
           <p class="summary reveal">
-            사용자가 영어 단어 퀴즈를 직접 생성하고 풀어볼 수 있는 서비스로, 자체 로그인(이메일 인증·로그인 유지)과 
-            OAuth 2.0 기반 카카오·구글 소셜 로그인을 함께 지원하는 인증·인가 체계를 구축한 프로젝트
+            사용자가 영어 단어 퀴즈를 직접 생성하고 풀어볼 수 있는 서비스로,
+            자체 로그인(이메일 인증·로그인 유지)과 OAuth 2.0 기반 카카오·구글
+            소셜 로그인을 함께 지원하는 인증·인가 체계를 구축한 프로젝트
           </p>
 
           <div class="spec crop reveal">
@@ -113,8 +114,8 @@
               <span class="sv">
                 <span class="tk">Java</span>
                 <span class="tk">Spring Boot</span><span class="tk">OAuth2</span
-                ><span class="tk">JPA</span>
-                <span class="tk">JWT</span><span class="tk">Spring Security</span
+                ><span class="tk">JPA</span> <span class="tk">JWT</span
+                ><span class="tk">Spring Security</span
                 ><span class="tk">H2</span>
               </span>
             </div>
@@ -143,23 +144,29 @@
             </div>
             <div class="caps-acc reveal">
               <details class="cap" open>
-                <summary>OAuth2 소셜 로그인 통합 구현 (구글/카카오/네이버)</summary>
+                <summary>
+                  OAuth2 소셜 로그인 통합 구현 (구글/카카오/네이버)
+                </summary>
                 <ul>
                   <li>
-                    DefaultOAuth2UserService를 상속한 CustomOAuth2UserService를 구현하여, 
-                    소셜 인증 성공 시점에 회원 정보를 조회·저장하는 흐름을 Spring Security 인증 파이프라인에 통합
+                    DefaultOAuth2UserService를 상속한 CustomOAuth2UserService를
+                    구현하여, 소셜 인증 성공 시점에 회원 정보를 조회·저장하는
+                    흐름을 Spring Security 인증 파이프라인에 통합
                   </li>
                   <li>
-                    제공자마다 상이한 사용자 정보 응답 구조(네이버 response 중첩, 카카오
-                    kakao_account.profile 중첩, 구글 평면 구조)를 OAuthAttributes 정적 팩토리 메서드로 분기
-                    처리하여, 신규 제공자 추가 시 변환 메서드만 확장하면 되는 구조로 설계
+                    제공자마다 상이한 사용자 정보 응답 구조(네이버 response
+                    중첩, 카카오 kakao_account.profile 중첩, 구글 평면 구조)를
+                    OAuthAttributes 정적 팩토리 메서드로 분기 처리하여, 신규
+                    제공자 추가 시 변환 메서드만 확장하면 되는 구조로 설계
                   </li>
                   <li>
-                    기본적으로 서버 세션에 저장 되는 OAuth 인증 요청 정보를 쿠키에 저장하도록 구현하여, 
-                    서버 세션에 의존하지 않는 인증 구조 구성
+                    기본적으로 서버 세션에 저장 되는 OAuth 인증 요청 정보를
+                    쿠키에 저장하도록 구현하여, 서버 세션에 의존하지 않는 인증
+                    구조 구성
                   </li>
                   <li>
-                    인증 요청 정보를 쿠키에 저장할 수 있도록 직렬화·인코딩하여 전달하고, 3분 후 자동 만료되도록 설정
+                    인증 요청 정보를 쿠키에 저장할 수 있도록 직렬화·인코딩하여
+                    전달하고, 3분 후 자동 만료되도록 설정
                   </li>
                 </ul>
               </details>
@@ -167,24 +174,28 @@
                 <summary>JWT 기반 인증 구조 구현</summary>
                 <ul>
                   <li>
-                    JWT의 생성·검증·복호화 책임을 JwtTokenProvider로 분리하여 토큰 관련 로직을 한 곳에서 관리하고, 
-                    시크릿 키는 외부 설정으로 분리하여 보안 관리
+                    JWT의 생성·검증·복호화 책임을 JwtTokenProvider로 분리하여
+                    토큰 관련 로직을 한 곳에서 관리하고, 시크릿 키는 외부
+                    설정으로 분리하여 보안 관리
                   </li>
                   <li>
-                    JWT 인증 필터를 Spring Security 인증 필터 앞에 적용하여, 요청의 Bearer 토큰을 검증하고 인증 정보를 
-                    SecurityContext에 등록하는 무상태 인증 구조 구현
+                    JWT 인증 필터를 Spring Security 인증 필터 앞에 적용하여,
+                    요청의 Bearer 토큰을 검증하고 인증 정보를  SecurityContext에
+                    등록하는 무상태 인증 구조 구현
                   </li>
                   <li>
-                    JWT에 포함된 사용자 권한 정보를 활용해 별도의 DB 조회 없이 인증 객체를 생성하여 
-                    인증 과정의 불필요한 조회 제거
+                    JWT에 포함된 사용자 권한 정보를 활용해 별도의 DB 조회 없이
+                    인증 객체를 생성하여 인증 과정의 불필요한 조회 제거
                   </li>
                   <li>
-                    토큰 검증 실패 사유를 Exception 유형별로 분리 로깅하여 원인 추적이 가능하도록 구현
+                    토큰 검증 실패 사유를 Exception 유형별로 분리 로깅하여 원인
+                    추적이 가능하도록 구현
                   </li>
                   <li>
-                    OAuth2 인증 성공시 핸들러에서 발급한 JWT를 redirect URI의 쿼리 파라미터로 전달하여, 
-                    소셜 로그인과 자체 토큰 인증을 하나의 흐름으로 연결               
-                </li>
+                    OAuth2 인증 성공시 핸들러에서 발급한 JWT를 redirect URI의
+                    쿼리 파라미터로 전달하여, 소셜 로그인과 자체 토큰 인증을
+                    하나의 흐름으로 연결
+                  </li>
                 </ul>
               </details>
               <p class="cap plain">JPA 연관관계 설계 및 도메인 모델링</p>
