@@ -404,19 +404,20 @@
                 <div class="ps-row">
                   <span class="ps-label"> 상황</span
                   ><span class="ps-text"
-                    >MyBatis 사용 시 코드 가독성이 떨어지거나 사소한 스키마
+                    >MyBatis 사용 시 코드 가독성이 떨어지고 사소한 스키마
                     변경에도 관련 XML Mapper 파일을 전부 찾아서 수정해야 하는 등
-                    유지 보수에 어려움이 있고 또한 MSSQL을 추후 다른 DB를 변경할
-                    가능성도 있어 JPA로의 마이그레이션을 결정함.
+                    유지 보수에 어려움이 있었음. 또한 현재 사용하고 있는 DB를
+                    추후 다른 DB를 변경할 가능성이 있어 DB 의존성을 낮추기 위해
+                    JPA로의 마이그레이션을 결정함.
                   </span>
                 </div>
                 <div class="ps-row">
                   <span class="ps-label">문제</span
                   ><span class="ps-text">
                     약 60개가 넘는 테이블들을 엔티티 파일로 변경해야 하고 이를
-                    수작업으로 진행 시 필드 타입 오타등 휴먼 에러가 발생할
-                    확률이 높음. 따라서 테이블의 메타데이터를 조회해 엔티티 및
-                    repository, mapstruct 파일 생성을 자동화 하여야겠다고 판단.
+                    수작업으로 진행 시 오타등 휴먼 에러가 발생할 확률이 높음.
+                    따라서 테이블의 메타데이터를 조회해 엔티티 및 repository,
+                    mapstruct 파일 생성을 자동화 하여야겠다고 판단.
                   </span>
                 </div>
                 <div class="ps-row">
