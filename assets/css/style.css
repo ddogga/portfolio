@@ -1117,4 +1117,19 @@ details.cap > ul > li::before {
   color: var(--faint);
   font-family: "IBM Plex Mono", monospace;
 }
-.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; position: relative; }
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  position: relative;
+}
+
+.ps-figure {
+  margin: 16px 0 4px;
+}
+.ps-figure img {
+  width: 100%;
+  max-width: 680px;
+  height: auto;
+}
