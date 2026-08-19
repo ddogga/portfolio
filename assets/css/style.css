@@ -975,8 +975,8 @@ footer {
    ====================================================== */
 .detail-layout {
   display: grid;
-  grid-template-columns: 320px 1fr;
-  gap: 56px;
+  grid-template-columns: 230px 1fr;
+  gap: 35px;
   padding-top: 34px;
   align-items: start;
 }
