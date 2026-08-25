@@ -161,21 +161,6 @@
                 </ul>
               </details>
               <details class="cap" open>
-                <summary>Spring Reflection을 활용한 중복 로직 제거</summary>
-                <ul>
-                  <li>
-                    대상 클래스만 다른 동일한 처리 로직을 Reflection 기반 공통
-                    로직으로 통합
-                  </li>
-                  <li>
-                    중복 코드를 제거하고 API 구조를 단순화하여 유지보수성 향상
-                  </li>
-                  <li>
-                    신규 기능 추가 시 동일 로직 재사용이 가능하도록 구조 개선
-                  </li>
-                </ul>
-              </details>
-              <details class="cap" open>
                 <summary>요구 사항 분석 및 기획</summary>
                 <ul>
                   <li>
@@ -214,6 +199,119 @@
             <article class="ps-case reveal">
               <div class="ps-head">
                 <span class="ps-no">PS-01</span
+                ><span class="ps-title"
+                  >임베디드 DB를 영속 저장소로 볼 것인가, 세션 작업 저장소로 볼
+                  것인가</span
+                >
+              </div>
+              <div class="ps-body">
+                <div class="ps-row">
+                  <span class="ps-label">문제 상황</span
+                  ><span class="ps-text">
+                    <p>
+                      이 어플리케이션은 별도 DB 서버 설치 없이 애플리케이션에
+                      내장되는 무설치 배포가 요구사항이라, 경량 임베디드
+                      DB(H2·SQLite)가 후보였다. 동시에 이 도메인의
+                      <strong
+                        >최종 산출물이자 영구 데이터는 편집한 xml 파일
+                        자체</strong
+                      >이고, DB는 편집 세션 동안 xml 파일의 노드 트리(124개
+                      테이블 규모)를 다루기 위한 저장소일 뿐이었다. 즉 "DB를
+                      영구저장소로 볼 것인가, 세션용 작업 저장소로 볼 것인가"를
+                      결정해야 하는 상황이었다.
+                    </p>
+
+                    <p>
+                      이 결정을 앞당긴 건 구체적인 실패였다. SQLite에서 스키마를
+                      영속화하며 부팅하자 SessionFactory 빌드 단계에서
+                      [SQLITE_ERROR] too many terms in compound SELECT가
+                      발생했다. 원인은 SQLite 엔진이 아니라 xerial 드라이버가
+                      DatabaseMetaData 조회를 스키마 크기에 비례하는 거대한
+                      UNION ALL 쿼리로 생성해 compound SELECT 상한(기본 500)을
+                      초과한 것으로, 124개 테이블 규모에서 재현됐고 H2에서는
+                      재현되지 않았다. 이 실패가 "DB의 역할을 무엇으로 규정할
+                      것인가"라는 질문을 강제했다.
+                    </p>
+                  </span>
+                </div>
+                <div class="ps-row">
+                  <span class="ps-label">분석</span
+                  ><span class="ps-text"
+                    >이 어플리케이션의 진짜 영구 데이터는 DB가 아니라 파일
+                    자체라는 점을 생각해 DB는 편집 세션 동안 xml 파일의 노드
+                    트리를 CRUD하기 위한 작업 저장소로 여길 수도 있겠다는 판단이
+                    들었다. 즉 영구 데이터는 파일로 관리하고, DB는 휘발성으로
+                    규정해도 데이터 손실 위험이 없다고 결론을 내렸다. 또한 영구
+                    데이터를 DB가 아니라 파일로 관리하면, 사용자가 편집 내용을
+                    파일로 export하고 싶어 할 때 영구 저장소에 존재하는 파일을
+                    그대로 떨궈주기만 하면 되어 매번 DB의 정보를 기반으로 파일을
+                    생성하지 않아도 되므로 캐싱 효과까지 있을 것이라는 판단이
+                    들었다.</span
+                  >
+                </div>
+                <div class="ps-row">
+                  <span class="ps-label">구현</span
+                  ><span class="ps-text"
+                    >ddl-auto=create로 확정하고 영구 저장소는 파일 시스템으로
+                    이원화 함.
+                    <ul>
+                      <li>
+                        서버 기동 : workspace 디렉토리 스캔 → DB에 워크스페이스
+                        정보 및 해당 워크스페이스 아래에 작업중인 파일들의
+                        파일정보(폴더 경로, 생성날짜 등) 등록
+                      </li>
+                      <br />
+                      <li>Load : 파일 → DB에 파일 내용을 insert.</li>
+                      <br />
+                      <li>
+                        파일 ↔ DB 불일치 체크 : create/update/delete 컨트롤러를
+                        AOP로 가로채 파일의 수정이 일어날 시 project의 UUID
+                        재발급 → fileUUID와 비교해 DB와 파일 저장소의 파일의
+                        불일치 여부를 판단하여 사용자에게 알림.
+                      </li>
+                      <br />
+                      <li>
+                        Save : 사용자가 화면에서 저장 버튼 클릭 시 영구 저장소의
+                        파일을 사용자가 지정한 폴더 경로로 떨궈줌. 사용자가
+                        저장을 요청할 때만 파일 저장을 진행하고 자동 저장 기능은
+                        지원하지 않음.
+                      </li>
+                    </ul>
+                  </span>
+                </div>
+                <div class="ps-row lesson">
+                  <span class="ps-label">결과</span
+                  ><span class="ps-text"
+                    >DB 무설치 단일 배포라는 제약을 지키면서 단순한 에러 회피를
+                    넘어 도메인과 정합적인 저장 아키텍처를 얻게 되었다.
+                    <ul>
+                      <li>
+                        이중 저장소 정합성 문제 제거 — 파일을 유일한 정답
+                        데이터로 취급하여 DB를 영속화 했을 때 발생할 파일 ↔ DB
+                        상태 불일치와 동기화 문제를 없앰.
+                      </li>
+                      <br />
+                      <li>
+                        <strong>스키마 마이그레이션·드리프트 관리 제거</strong>
+                        — 매 기동 create로 스키마를 재생성해, 124개 테이블이
+                        항상 현재 엔티티 정의와 일치. 마이그레이션 스크립트·버전
+                        관리 부담이 사라졌다.
+                      </li>
+                      <br />
+                      <li>
+                        백업 단순화 — 매 기동 깨끗한 스키마로 시작해 임베디드
+                        DB에 상태가 누적·손상될 여지가 없고, 백업/보호 대상이
+                        DB가 아닌 파일 폴더로 단순화됐다.
+                      </li>
+                    </ul>
+                  </span>
+                </div>
+              </div>
+            </article>
+
+            <article class="ps-case reveal">
+              <div class="ps-head">
+                <span class="ps-no">PS-02</span
                 ><span class="ps-title"
                   >JPA의 deleteById가 @Version을 무시하는 문제</span
                 >
@@ -259,7 +357,7 @@
 
             <article class="ps-case reveal">
               <div class="ps-head">
-                <span class="ps-no">PS-02</span
+                <span class="ps-no">PS-03</span
                 ><span class="ps-title"
                   >예외를 catch 했는데도 트랜잭션이 롤백되는 문제</span
                 >
@@ -307,7 +405,7 @@
 
             <article class="ps-case reveal">
               <div class="ps-head">
-                <span class="ps-no">PS-03</span
+                <span class="ps-no">PS-04</span
                 ><span class="ps-title"
                   >엔티티 하나 조회에 상위 테이블 10개 이상이 딸려오는
                   문제</span
