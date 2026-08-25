@@ -236,8 +236,14 @@
                 </div>
                 <div class="ps-row">
                   <span class="ps-label">분석</span
-                  ><span class="ps-text"
-                    >이 어플리케이션의 진짜 영구 데이터는 DB가 아니라 파일
+                  ><span class="ps-text">
+                    <div class="ps-figure">
+                      <img
+                        src="../assets/img/db_disk_sync_architecture.png"
+                        alt="파일 시스템을 영구 저장소로, 임베디드 DB를 편집 세션용 작업 저장소로 이원화한 아키텍처 구성도"
+                      />
+                    </div>
+                    이 어플리케이션의 진짜 영구 데이터는 DB가 아니라 파일
                     자체라는 점을 생각해 DB는 편집 세션 동안 xml 파일의 노드
                     트리를 CRUD하기 위한 작업 저장소로 여길 수도 있겠다는 판단이
                     들었다. 즉 영구 데이터는 파일로 관리하고, DB는 휘발성으로
