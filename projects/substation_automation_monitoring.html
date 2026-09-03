@@ -159,12 +159,12 @@
                   </li>
                 </ul>
               </details>
-              <details class="cap" open>
+              <!-- <details class="cap" open>
                 <summary>MongoDB 인덱스 최적화</summary>
                 <ul>
                   <li>조회 패턴을 고려한 인덱스를 설계하여 검색 성능 개선</li>
                 </ul>
-              </details>
+              </details> -->
               <details class="cap" open>
                 <summary>에러 코드 표준화 및 다국어(i18n) 지원</summary>
                 <ul>
@@ -255,10 +255,10 @@
                   ><span class="ps-text">
                     <p>1. 서브쿼리 가공 → 애플리케이션 레벨 처리로 이관</p>
                     <p>
-                      2. LIKE절을 CHARINDEX 기반 equality 비교로 전환: 검색
-                      대상이 정해진 패턴을 따르는 데이터라는 점을 활용해, 부분
-                      문자열 매칭을 동등 비교로 치환. 임의 부분 검색의 유연성을
-                      포기하는 대신, 패턴이 보장되는 영역에서 성능을 확보.
+                      2. LIKE절을 equality 비교로 전환: 검색 대상이 정해진
+                      패턴을 따르는 데이터라는 점을 활용해,부분 문자열 매칭을
+                      동등 비교로 치환. 임의 부분 검색의 유연성을 포기하는 대신,
+                      패턴이 보장되는 영역에서 성능을 확보.
                     </p>
                     <p>
                       3. 비정규화로 조인 제거: 다른 테이블을 참조하던 검색
