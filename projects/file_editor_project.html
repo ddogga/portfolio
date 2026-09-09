@@ -139,38 +139,22 @@
                     다중 사용자 환경에서 발생 가능한 데이터 충돌을 방지하기 위해
                     낙관적 락과 비관적 락 적용
                   </li>
-                  <li>동시 수정 상황에서도 데이터 정합성을 유지하도록 개선</li>
                   <li>사용자 간 편집 충돌로 인한 데이터 손실 가능성 감소</li>
                 </ul>
               </details>
               <details class="cap" open>
-                <summary>IEC 61850 표준 기반 파일 편집 기능 구현</summary>
+                <summary>요구 사항 분석과 기획 및 구현</summary>
                 <ul>
                   <li>
-                    복잡한 IEC 61850 XML 구조를 분석하여 표준 규격 파일을 읽고
-                    수정하는 편집 기능 개발
+                    복잡한 IEC 61850 규정을 분석하여 사용자가 국제 표준을 깊이
+                    이해하지 않아도 표준에 맞는 파일을 생성하고 수정할수 있는
+                    파일 편집기 기획 및 개발
                   </li>
+                  <li>사용자 편의성을 고려한 편집 흐름 정의</li>
                   <li>
                     org.w3c.dom.Document를 활용해 XML 노드를 직접 조작하고
                     규격에 맞는 파일 생성 기능 구현
                   </li>
-                  <li>
-                    사용자가 국제 표준을 깊이 이해하지 않아도 규격에 맞는 파일을
-                    작성할 수 있는 편집 환경 제공
-                  </li>
-                </ul>
-              </details>
-              <details class="cap" open>
-                <summary>요구 사항 분석 및 기획</summary>
-                <ul>
-                  <li>
-                    IEC 61850 국제 표준을 분석하여 파일 편집기 요구사항 도출
-                  </li>
-                  <li>
-                    사용자가 표준 지식 없이도 파일을 생성·수정할 수 있도록 기능
-                    설계
-                  </li>
-                  <li>사용자 편의성을 고려한 편집 흐름 정의</li>
                 </ul>
               </details>
               <details class="cap" open>
@@ -222,15 +206,14 @@
                     </p>
 
                     <p>
-                      이 결정을 앞당긴 건 구체적인 실패였다. SQLite에서 스키마를
-                      영속화하며 부팅하자 SessionFactory 빌드 단계에서
-                      [SQLITE_ERROR] too many terms in compound SELECT가
-                      발생했다. 원인은 SQLite 엔진이 아니라 xerial 드라이버가
-                      DatabaseMetaData 조회를 스키마 크기에 비례하는 거대한
-                      UNION ALL 쿼리로 생성해 compound SELECT 상한(기본 500)을
-                      초과한 것으로, 124개 테이블 규모에서 재현됐고 H2에서는
-                      재현되지 않았다. 이 실패가 "DB의 역할을 무엇으로 규정할
-                      것인가"라는 질문을 강제했다.
+                      이 결정을 앞당긴 건 구체적인 실패였다. SQLite를 사용해
+                      124개 테이블 규모의 스키마를 `ddl-auto: update` 설정으로
+                      영속화한 상태에서 애플리케이션을 부팅하자, SessionFactory
+                      빌드 단계에서 `[SQLITE_ERROR] too many terms in compound
+                      SELECT` 오류가 발생했다. 해당 환경에서는 정상적인 부팅이
+                      어려워 SQLite를 사용할 수 없었고, 결국 H2 DB로 변경했다.
+                      이 실패는 단순한 DB 교체를 넘어, "DB의 역할을 무엇으로
+                      규정할 것인가"라는 질문을 강제했다.
                     </p>
                   </span>
                 </div>
@@ -258,16 +241,20 @@
                 <div class="ps-row">
                   <span class="ps-label">구현</span
                   ><span class="ps-text"
-                    >ddl-auto=create로 확정하고 영구 저장소는 파일 시스템으로
-                    이원화 함.
+                    >ddl-auto: create로 DB 스키마를 재기동시 매번 초기화 하도록
+                    확정, 영구 저장소는 파일 시스템으로 이원화 함.
                     <ul>
                       <li>
-                        서버 기동 : workspace 디렉토리 스캔 → DB에 워크스페이스
-                        정보 및 해당 워크스페이스 아래에 작업중인 파일들의
-                        파일정보(폴더 경로, 생성날짜 등) 등록
+                        서버 기동: workspace 디렉토리를 스캔해 워크스페이스
+                        정보를 DB에 등록하고, 각 워크스페이스에 존재하는
+                        파일들의 파일 경로, 생성일 등의 메타데이터를 함께 DB에
+                        등록.
                       </li>
                       <br />
-                      <li>Load : 파일 → DB에 파일 내용을 insert.</li>
+                      <li>
+                        파일 불러오기 : 파일 시스템에 존재하는 파일을 읽어 DB에
+                        파일 내용을 insert
+                      </li>
                       <br />
                       <li>
                         파일 ↔ DB 불일치 체크 : create/update/delete 컨트롤러를
@@ -277,10 +264,9 @@
                       </li>
                       <br />
                       <li>
-                        Save : 사용자가 화면에서 저장 버튼 클릭 시 영구 저장소의
-                        파일을 사용자가 지정한 폴더 경로로 떨궈줌. 사용자가
-                        저장을 요청할 때만 파일 저장을 진행하고 자동 저장 기능은
-                        지원하지 않음.
+                        Save : 사용자가 화면에서 저장 버튼을 클릭한 시점에만
+                        DB의 파일 내용을 파일 시스템에 반영하고, 사용자가 지정한
+                        폴더 경로에 파일을 생성. 자동 저장은 지원하지 않음.
                       </li>
                     </ul>
                   </span>
@@ -318,52 +304,6 @@
             <article class="ps-case reveal">
               <div class="ps-head">
                 <span class="ps-no">PS-02</span
-                ><span class="ps-title"
-                  >JPA의 deleteById가 @Version을 무시하는 문제</span
-                >
-              </div>
-              <div class="ps-body">
-                <div class="ps-row">
-                  <span class="ps-label">문제 상황</span
-                  ><span class="ps-text"
-                    >어떤 사용자가 수정중인 데이터를 다른 사용자가 삭제 시 락이
-                    완전히 무시되어 수정-삭제 충돌이 발생.</span
-                  >
-                </div>
-                <div class="ps-row">
-                  <span class="ps-label">원인</span
-                  ><span class="ps-text"
-                    >JPA에서 기본으로 제공되는 deleteById 메서드 사용시
-                    기본적으로 삭제 경로에서 버전을 체크하지 않는 동작 특성
-                    때문에 낙관적 락이 삭제에는 적용되지 않았다.</span
-                  >
-                </div>
-                <div class="ps-row">
-                  <span class="ps-label">해결 방법</span
-                  ><span class="ps-text"
-                    >수정은 @Version 낙관적 락(충돌 시 ConflictException 409로
-                    재시도 유도), 삭제엔 PESSIMISTIC_WRITE (비관적 락 쓰기 잠금)
-                    과 함께 deleteById를 버전 체크 삭제 쿼리 (`delete ... where
-                    id=:id and version=:version) 또는 soft-delete로 교체하고,
-                    중복은 DB UNIQUE 제약으로 최종 방어하며, 서비스 트랜잭션을
-                    readOnly 기본+쓰기만 개별로 분리했다.
-                  </span>
-                </div>
-                <div class="ps-row lesson">
-                  <span class="ps-label">핵심 교훈</span
-                  ><span class="ps-text"
-                    >deleteById가 낙관적 락을 우회하듯 ORM 편의 메서드가
-                    안전장치를 건너뛸 수 있으므로 삭제에도 버전 보장이 필요하면
-                    명시적으로 통제해야 하며, 낙관적(편집)·비관적(삭제) 락은
-                    상황에 맞게 나눠 써야 한다.
-                  </span>
-                </div>
-              </div>
-            </article>
-
-            <article class="ps-case reveal">
-              <div class="ps-head">
-                <span class="ps-no">PS-03</span
                 ><span class="ps-title"
                   >예외를 catch 했는데도 트랜잭션이 롤백되는 문제</span
                 >
@@ -411,7 +351,7 @@
 
             <article class="ps-case reveal">
               <div class="ps-head">
-                <span class="ps-no">PS-04</span
+                <span class="ps-no">PS-03</span
                 ><span class="ps-title"
                   >엔티티 하나 조회에 상위 테이블 10개 이상이 딸려오는
                   문제</span
