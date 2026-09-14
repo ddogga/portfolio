@@ -297,7 +297,81 @@
 
             <article class="ps-case reveal">
               <div class="ps-head">
-                <span class="ps-no">PS-02</span
+                <span class="ps-no">PS-02</span>
+                <span class="ps-title">MongoDB 인덱스 최적화</span>
+              </div>
+              <div class="ps-body">
+                <div class="ps-row">
+                  <span class="ps-label">문제 상황</span
+                  ><span class="ps-text"
+                    >로그성 컬렉션인 Report는 실시간으로 끊임없이 적재되는
+                    insert가 극도록 잦은 컬렉션인데 운영 중 이 컬렉션을 조회하는
+                    API의 응답이 점차 느려짐.
+                  </span>
+                </div>
+                <div class="ps-row">
+                  <span class="ps-label">분석</span
+                  ><span class="ps-text">
+                    조회 쿼리의 검색 조건은 iedId 리스트, reason, 생성 날짜 범위
+                    인데, 생성 날짜 범위를 제외하고는 모두 optional 조건이라
+                    인덱스 하나로 모든 케이스를 최적화 할 수 없었음. 또한
+                    iedId는 매번 다른 값 조합의 리스트($in)로 검색 조건(ex :
+                    [IED001, IED002, ….])이 들어와서 이 필드를 기준으로 인덱스를
+                    설정해도 재사용성이 낮아 보였음. 따라서 값의 종류가 적은
+                    enum성 필드인 reason를 기준으로 인덱스 생성을 결정.
+                  </span>
+                </div>
+                <div class="ps-row">
+                  <span class="ps-label">해결 과정</span
+                  ><span class="ps-text">
+                    <p>
+                      1. {insertDt: -1, _id: -1}  복합 인덱스 생성 — reason
+                      필터가 없는 쿼리 담당. insertDt 범위 조건과 insertDt /
+                      _id 정렬을 인덱스 순서 그대로 스캔해, 정렬을 위한
+                      in-memory sort를 제거.
+                    </p>
+                    <p>
+                      2. {reason: 1, insertDt: -1, _id: -1} 복합 인덱스 생성 —
+                      reason 필터가 있는 쿼리 담당. 등치 조건인 reason을 선두에
+                      두고 정렬 필드를 이어 붙여, 필터 + 정렬을 하나의
+                      인덱스로 처리.
+                    </p>
+                    <p>
+                      3. _id는 insertDt가 같을 때 커서를 안정적으로 확정하기
+                      위한 tie-breaker.
+                    </p>
+                    <p>
+                      4. iedId는 의도적으로 인덱스에서 제외 : 이 컬렉션은
+                      insert가 매우 잦아 인덱스가 늘 수록 쓰기 비용이 커짐.
+                      따라서 재사용성이 높은 reason필드 기준으로 인덱스를
+                      생성하고, iedId는 첫번째 복합 인덱스(insertDt + _id )로
+                      좁혀진 후보군에서 필터링하는 것으로 충분하다고 판단.
+                    </p>
+                  </span>
+                </div>
+                <div class="ps-row lesson">
+                  <span class="ps-label">결과</span
+                  ><span class="ps-text"
+                    ><ui>
+                      <li>
+                        복합 인덱스 설정으로 COLLSCAN + blocking sort →
+                        IXSCAN으로 전환, 검사 문서 수(examined docs)를 200,000 →
+                        709로 약 99.6% 절감하고 in-memory sort를 제거해 응답
+                        시간을 46ms → 1ms로 단축.
+                      </li>
+                      <li>
+                        무분별하게 인덱스를 추가하는 대신 필드 특성을 고려해
+                        최소 인덱스만 설정하여 insert 쓰기 오버헤드를 최소화함.
+                      </li>
+                    </ui>
+                  </span>
+                </div>
+              </div>
+            </article>
+
+            <article class="ps-case reveal">
+              <div class="ps-head">
+                <span class="ps-no">PS-03</span
                 ><span class="ps-title">대규모 코드 리팩토링</span>
               </div>
               <div class="ps-body">
@@ -351,7 +425,7 @@
 
             <article class="ps-case reveal">
               <div class="ps-head">
-                <span class="ps-no">PS-03</span>
+                <span class="ps-no">PS-04</span>
                 <span class="ps-title">스레드 무한 대기 문제 예방</span>
               </div>
               <div class="ps-body">
@@ -401,7 +475,7 @@
 
             <article class="ps-case reveal">
               <div class="ps-head">
-                <span class="ps-no">PS-04</span>
+                <span class="ps-no">PS-05</span>
                 <span class="ps-title"
                   >Mybatis -> JPA 마이그레이션 작업 효율 향상</span
                 >
