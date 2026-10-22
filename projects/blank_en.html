@@ -184,8 +184,13 @@
                 </ul>
               </details>
               <details class="cap" open>
-                <summary>AWS기반 배포 환경 구축</summary>
+                <summary>AWS기반 운영 환경 구축</summary>
                 <ul>
+                  <li>
+                    GitHub Actions·ECR·nginx 기반 블루 그린 배포 파이프라인을
+                    구축하여, 헬스 체크 통과 시에만 트래픽을 전환하고 실패 시
+                    기존 버전을 유지하는 무중단 배포 구현
+                  </li>
                   <li>
                     보안 그룹 간 참조(ALB → EC2 → RDS·ElastiCache)로 계층별 진입
                     경로를 단일화하고, RDS와 ElastiCache를 프라이빗 서브넷에
