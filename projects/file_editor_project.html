@@ -133,11 +133,13 @@
             </div>
             <div class="caps-acc reveal">
               <details class="cap" open>
-                <summary>동시 편집 환경에서 데이터 정합성 보장</summary>
+                <summary>
+                  트리 구조 데이터 동시 편집 환경에서 데이터 정합성 보장
+                </summary>
                 <ul>
                   <li>
-                    동시 수정시 낙관적 락을 통한 동시성 관리 및 편집 이벤트
-                    트래킹을 통한 수정 중인 데이터 삭제 차단
+                    수정 충돌 낙관적 락 관리, 삭제 충돌시 하위 노드 점유 확인과
+                    비관적 락 관리, 점유 경쟁은 unique 제약 조건으로 차단
                   </li>
                   <li>사용자 간 편집 충돌로 인한 데이터 손실 가능성 감소</li>
                 </ul>
@@ -300,45 +302,52 @@
               <div class="ps-head">
                 <span class="ps-no">PS-02</span
                 ><span class="ps-title"
-                  >예외를 catch 했는데도 트랜잭션이 롤백되는 문제</span
+                  >파일 import시 rollback-only 문제 발생</span
                 >
               </div>
               <div class="ps-body">
                 <div class="ps-row">
                   <span class="ps-label">문제 상황</span
                   ><span class="ps-text"
-                    >별도 트랜잭션 빈에서 발생한 예외를 잡아 로그만 남기고 정상
-                    흐름을 이어갔는데, 정작 상위 트랜잭션 커밋 시점에 롤백 관련
-                    예외(UnexpectedRollbackException)가 발생했다.</span
+                    >파일 import시 예외는 catch해 건너 뛰고 정상 요소에 대해서만
+                    커밋하려 했으나 UnexpectedRollbackException이
+                    발생하였다.</span
                   >
                 </div>
                 <div class="ps-row">
                   <span class="ps-label">원인</span
                   ><span class="ps-text"
-                    >예외를 던진 쪽이 별도 트랜잭션 경계를 가진 빈이라 예외 발생
-                    시 트랜잭션이 이미 rollback-only로 마킹됐는데, 호출한 쪽이
-                    try-catch로 catch 구문에서 로그만 남기고 그 예외를 삼키는
-                    바람에 실제 트랜잭션 상태와 예외 흐름이 어긋난 것이
+                    >import한 파일의 특정 값이 DB 제약조건과 달라 save 호출시
+                    예외 발생했다. 리포지토리는 별도 논리 트랜잭션 경계를 가진
+                    빈이라 트랜잭션이 이미 rollback-only로 마킹됐는데, 호출한
+                    쪽이 catch 구문에서 로그만 남기고 그 예외를 삼키는 바람에
+                    실제 트랜잭션 상태와 예외 흐름이 어긋난 것이
                     원인이었다.</span
                   >
                 </div>
                 <div class="ps-row">
                   <span class="ps-label">해결 방법</span
                   ><span class="ps-text"
-                    >예외를 삼키지 않고 그대로 위로 전파하도록 수정해,
-                    트랜잭션의 롤백 상태와 예외 흐름을 일치시켰다.
-                    Propagation.REQUIRES_NEW를 이용해 트랜잭션을 분리한 부분
-                    커밋 방법도 고려해 봤지만, 다중 사용자 환경에서 동시성이슈가
-                    있을 것 같아 전체 롤백 시키는 정책을 채택했다.
+                    >import시 경우에 따라 80개 이상의 테이블에 insert 쿼리가
+                    나가고, 수많은 DB제약조건에 대해서 조건문으로 검사를 하는 건
+                    불가능했다. Propagation.REQUIRES_NEW를 이용해 트랜잭션을
+                    분리한 부분 커밋 방법도 고려해 봤지만, 내부 트랜잭션 성공 후
+                    외부 트랜잭션 작업 실패나 커넥션 풀 고갈 문제등 트랜잭션
+                    분리로 인한 예기치 못한 문제가 발생할 수 있었다. 따라서
+                    예외를 삼키지 않고 그대로 위로 전파하도록 수정해, 트랜잭션의
+                    롤백 상태와 예외 흐름을 일치시키고 import 단위의 원자성을
+                    보장하는 전체 롤백 정책을 채택했다. 또한 실패 요소에 대해
+                    사용자에게 알려 수정 후 import 재시도를 유도하였다.
                   </span>
                 </div>
                 <div class="ps-row lesson">
                   <span class="ps-label">핵심 교훈</span
-                  ><span class="ps-text"
-                    >하위 작업에서 실패를 같은 트랜잭션 내에서 삼키는 것은
-                    불가능 하고, 만약 동시성 이슈의 가능성이 있는 상황이라면
-                    데이터 정합성을 위해 전체 롤백 정책을 고려해 봐야 할 수
-                    있다는 것을 배움.
+                  ><span class="ps-text">
+                    트랜잭션의 롤백은 단순히 예외 catch여부가 아니라 예외가
+                    트랜잭션 프록시 경계를 통과하는 순간 결정된다는 것을 배웠다.
+                    따라서 실패를 흡수할지는 그 경계 안쪽에서 설계해야 하고
+                    트랜잭션 분리는 커넥션 풀이나 데이터 정합성등을 고려해 결정
+                    해야 한다는 것을 배웠다.
                   </span>
                 </div>
               </div>
@@ -371,17 +380,10 @@
                 <div class="ps-row">
                   <span class="ps-label">해결 방법</span
                   ><span class="ps-text"
-                    >연관관계를 지연 로딩(LAZY)로 변경. 연관관계의 데이터가
-                    실제로 필요한 조회에서는 fetch join으로 필요할 때만 데이터를
-                    가져오도록 구현. 지연 로딩만 쓸 때 발생 할 수 있는 N+1 조회
-                    문제를 예방</span
-                  >
-                </div>
-                <div class="ps-row lesson">
-                  <span class="ps-label">핵심 교훈</span
-                  ><span class="ps-text"
-                    >연관관계는 기본적으로 지연 로딩으로 두고, 데이터가 실제로
-                    필요한 시점에만 명시적으로 함께 가져오는 것이 좋음.</span
+                    >연관관계를 지연 로딩(LAZY)로 변경. 상위 노드 데이터가
+                    필요한 하위노드 조회에서는 ToOne연관 관계 기준으로 fetch
+                    join을 적용하여 조회 구현. 지연 로딩 설정시 발생 할 수 있는
+                    N+1 조회 문제를 예방</span
                   >
                 </div>
               </div>
